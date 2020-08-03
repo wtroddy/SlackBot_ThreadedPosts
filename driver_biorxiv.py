@@ -1,9 +1,11 @@
 from slack_api_functions import slack_api
+import configparser
 
-
-# inputs 
-bot_token = open("bot_token.txt", "r").read()
-channel = "C0181PVV6EN"
+# load config file
+bot_config = configparser.RawConfigParser()   
+bot_config.read("bot.cfg")
+bot_token = bot_config.get('slack-bot-config', 'bot_token')
+channel = bot_config.get('slack-bot-config', 'channel')
 
 # ================ run the constructor =============== #
 bot = slack_api()

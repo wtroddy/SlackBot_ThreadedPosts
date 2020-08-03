@@ -22,7 +22,7 @@ bot.makePayload()
 import datetime 
 today = str(datetime.date.today())
 
-thread_header = "*Here the astro-ph posts from* " + "*" + today + "!*"
+thread_header = "*Here are the astro-ph posts from* " + "*" + today + "!*"
 bot.makePayload(text=thread_header)
 bot.postSlackChat()
 
