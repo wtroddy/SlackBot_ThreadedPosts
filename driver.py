@@ -6,7 +6,6 @@ bot_config = configparser.RawConfigParser()
 bot_config.read("bot.cfg")
 bot_token = bot_config.get('slack-bot-config', 'bot_token')
 channel = bot_config.get('slack-bot-config', 'channel')
-userID = bot_config.get('slack-bot-config', 'userID')
 
 # ================ run the constructor =============== #
 bot = slack_api()
@@ -43,48 +42,10 @@ import feedparser
 import time
 NewsFeed = feedparser.parse("https://arxiv.org/rss/astro-ph")
 
-# create a list to store responses
-resp_tracker = []
-
 for entry in NewsFeed.entries:
     # add the article to the payload 
     base_payload['text'] = "*Title:* " + entry['title'].split(".")[0] + '\n' + "*URL:* " + entry['link']
     # post
-    resp = bot.postSlackChat(payload = base_payload, return_response = True)
-    
-    # update response tracker
-    resp_tracker.append(resp)
-        
+    bot.postSlackChat(payload = base_payload)
     # sleep for 1s
     time.sleep(1)
-
-
-# handle response
-resp_ok_count = 0
-resp_other_count = 0
-code_reason = []
-
-for resp in resp_tracker:
-    # update flag
-    if resp.status_code == 200:
-        resp_ok_count = resp_ok_count+1
-    else:
-        resp_other_count = resp_other_count+1
-    # create list of events 
-    code_reason.append(str(resp.status_code)+': '+resp.reason)
-
-# check if there's a response otehr than 200 and send to user
-if resp_other_count != 0:
-    unq_codes = list(set(code_reason))
-    
-    count_dict = {}
-    
-    for i in unq_codes:
-        count_dict[i] = code_reason.count(i)
-    
-    bot.setThreadTS('')
-    bot.setChannel(userID)
-    bot.setText(count_dict)
-    bot.makePayload()
-    
-    bot.postSlackChat(return_response = True)
